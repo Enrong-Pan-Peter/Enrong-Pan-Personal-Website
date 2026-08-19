@@ -85,7 +85,14 @@ a:hover{color:var(--red)}
 .loc .mono{font-size:.72rem}
 .hand-inline{color:var(--red);font-size:19px}
 
-.nav{display:flex;flex-direction:column;gap:2px;margin:28px 0;border-top:1px dashed var(--line);padding-top:18px}
+.nav{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:3px 14px;
+  margin:24px 0;
+  border-top:1px dashed var(--line);
+  padding-top:16px;
+}
 .nav a{
   text-decoration:none;
   font-weight:500;
@@ -119,6 +126,8 @@ a:hover{color:var(--red)}
 .contact svg{width:17px;height:17px;flex:none;color:var(--olive)}
 .contact a:hover svg{color:var(--red)}
 
+.cv-row{display:flex;gap:12px;flex-wrap:wrap}
+.cv-row .cv-btn{margin-top:18px;padding:8px 13px;font-size:13px}
 .cv-btn{
   display:inline-block;
   margin-top:22px;
@@ -150,7 +159,18 @@ footer{margin-bottom:0}
   text-transform:uppercase;
   color:var(--olive);
   margin-bottom:10px;
+  display:flex;
+  align-items:center;
+  gap:10px;
 }
+.doodle{
+  width:22px;height:22px;flex:none;
+  color:var(--olive);
+  transform:rotate(-6deg);
+  transition:transform .25s ease;
+}
+.doodle .acc{stroke:var(--red);fill:none}
+section:hover .doodle,footer:hover .doodle{transform:rotate(4deg) scale(1.12)}
 h2{
   font-size:30px;
   font-weight:700;
@@ -254,8 +274,25 @@ h3{font-size:18px;font-weight:600;letter-spacing:-.01em}
   transition:transform .15s,box-shadow .15s;
 }
 .card:hover{transform:translateY(-3px) rotate(-.3deg);box-shadow:var(--shadow)}
-.card-stamp{position:absolute;top:14px;right:14px}
+.card-stamp{position:absolute;top:14px;right:14px;background:rgba(251,247,236,.92)}
 .card h3{padding-right:90px}
+.card-shot{
+  display:block;
+  margin:-22px -22px 16px;
+  border-bottom:1px solid var(--line);
+  border-radius:10px 10px 0 0;
+  overflow:hidden;
+  background:var(--paper);
+}
+.card-shot img{
+  display:block;width:100%;height:160px;
+  object-fit:cover;object-position:center top;
+  transition:transform .35s ease;
+}
+.card:hover .card-shot img{transform:scale(1.04)}
+.card-shot-tall img{height:330px;object-position:center top}
+.card-shot-diagram{padding:14px 10px;background:var(--paper-2)}
+.card-shot-diagram svg{display:block;width:100%;height:132px}
 .card p{margin-top:10px;color:var(--ink-soft);font-size:15px}
 .card .tech{color:var(--olive);font-size:.72rem;margin-top:12px}
 .card .links{margin-top:10px}
@@ -270,59 +307,83 @@ h3{font-size:18px;font-weight:600;letter-spacing:-.01em}
 }
 .awards li:first-child{margin-top:10px}
 
-/* photo wall */
-.wire-row{
-  position:relative;
-  display:flex;
-  justify-content:center;
-  align-items:flex-start;
-  gap:24px;
-  padding-top:30px;
+/* photo wheel — the Viscose carousel (MIT, Yousuf Soomro) embedded as a static export */
+.wheel-embed{
   margin-top:26px;
-  flex-wrap:wrap;
-}
-.wire-row::before{
-  content:"";
-  position:absolute;top:13px;left:-6px;right:-6px;
-  height:2px;
-  background:var(--olive);
-  opacity:.55;
-  border-radius:2px;
-}
-.hang{
-  position:relative;
-  background:#fffdf6;
-  border:1px solid var(--line-soft);
-  padding:9px 9px 11px;
-  width:206px;
+  border:1px solid var(--line);
+  border-radius:12px;
+  overflow:hidden;
+  background:#f7f7f7;
   box-shadow:var(--shadow);
-  transform:rotate(var(--r,0deg));
-  transform-origin:top center;
-  transition:transform .25s ease;
-  margin-top:2px;
 }
-.hang:hover{transform:rotate(0deg) translateY(3px)}
-.hang::before{
-  content:"";
-  position:absolute;top:-19px;left:50%;
-  width:14px;height:32px;
-  transform:translateX(-50%);
-  background:#b3906a;
-  border:1px solid #8f6f4d;
-  border-radius:3px;
+.wheel-embed iframe{display:block;width:100%;height:min(80vh,730px);border:0}
+.wheel-note{margin-top:12px;color:var(--olive);font-size:.72rem}
+.wheel-fallback{padding:22px;text-align:center}
+.wheel-fallback img{max-width:100%;border-radius:8px;display:block;margin:0 auto 14px}
+
+/* boat loader */
+#loader{
+  display:none;
+  position:fixed;
+  inset:0;
+  z-index:99;
+  background:var(--paper);
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:26px;
+  transition:opacity .5s ease;
+}
+body.js.loading #loader{display:flex}
+#loader.done{opacity:0;pointer-events:none}
+body.loading{overflow:hidden}
+.boat-scene{position:relative;width:340px;height:200px}
+#boat-canvas{
+  position:absolute;inset:0;width:100%;height:100%;display:none;
+  -webkit-mask-image:linear-gradient(90deg,transparent,#000 14%,#000 86%,transparent);
+  mask-image:linear-gradient(90deg,transparent,#000 14%,#000 86%,transparent);
+}
+.boat-scene.three-on #boat-canvas{display:block}
+.boat-scene.three-on .boat,.boat-scene.three-on .wave{display:none}
+.boat{
+  position:absolute;
+  left:50%;top:26px;
+  width:110px;
+  margin-left:-55px;
+  z-index:1;
+  animation:bob 2.8s ease-in-out infinite;
+}
+.wave{
+  position:absolute;
+  left:-8%;right:-8%;
+  height:34px;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='34' viewBox='0 0 60 34'%3E%3Cpath d='M0 18 Q15 2 30 18 Q45 34 60 18 L60 34 L0 34 Z' fill='%23a4bcc5'/%3E%3C/svg%3E");
+  background-repeat:repeat-x;
+  background-size:60px 34px;
+}
+.wave-back{
+  bottom:26px;
+  opacity:.55;
+  animation:drift 7s linear infinite;
+}
+.wave-front{
+  bottom:6px;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='34' viewBox='0 0 60 34'%3E%3Cpath d='M0 18 Q15 2 30 18 Q45 34 60 18 L60 34 L0 34 Z' fill='%237fa0ad'/%3E%3C/svg%3E");
+  animation:drift 4.5s linear infinite reverse;
   z-index:2;
 }
-.hang::after{
-  content:"";
-  position:absolute;top:-8px;left:50%;
-  width:4px;height:4px;
-  transform:translateX(-50%);
-  background:#6d6a63;
-  border-radius:50%;
-  z-index:3;
+@keyframes drift{from{background-position-x:0}to{background-position-x:-120px}}
+@keyframes bob{
+  0%,100%{transform:translateY(0) rotate(-2.5deg)}
+  50%{transform:translateY(7px) rotate(3deg)}
 }
-.hang img{display:block;width:100%;height:190px;object-fit:cover}
-.hang figcaption,.polaroid figcaption{
+.loader-meta{display:flex;align-items:center;gap:14px}
+.loader-bar{width:180px;height:2px;background:var(--line);border-radius:2px;overflow:hidden}
+#loader-fill{display:block;height:100%;width:0;background:var(--ink);transition:width .2s ease}
+#loader-count{font-size:.74rem;color:var(--olive);min-width:30px}
+.loader-note{font-size:.7rem;color:var(--olive);letter-spacing:.14em}
+
+.polaroid figcaption{
   font-family:var(--hand);
   font-size:15.5px;
   line-height:1.2;
@@ -372,7 +433,8 @@ body.js .reveal.in{opacity:1;transform:none}
 @media (prefers-reduced-motion:reduce){
   html{scroll-behavior:auto}
   body.js .reveal{opacity:1;transform:none;transition:none}
-  .hang,.polaroid,.card,.cv-btn{transition:none}
+  .polaroid,.card,.cv-btn{transition:none}
+  .boat,.wave{animation:none}
 }
 
 /* ---------- responsive ---------- */
@@ -387,6 +449,7 @@ body.js .reveal.in{opacity:1;transform:none}
   }
   .portrait{grid-row:1/6;margin-bottom:0}
   .portrait img{width:150px;height:170px}
+  .wheel-embed iframe{height:70vh}
   .nav{grid-column:1/-1;flex-direction:row;flex-wrap:wrap;gap:4px 18px;margin:18px 0 0}
   .nav a{padding-left:14px}
   .contact{grid-column:1/-1;padding-top:14px}
@@ -403,8 +466,7 @@ body.js .reveal.in{opacity:1;transform:none}
   .dates{order:-1;width:100%;padding-top:0}
   .awards li{flex-direction:column;align-items:flex-start;gap:2px}
   .inst{width:48px;height:48px}
-  .hang{width:calc(50% - 16px)}
-  .hang img{height:120px}
+  .wheel-embed iframe{height:60vh}
   .polaroid{width:calc(50% - 15px)}
   .polaroid img{height:130px}
   .polaroid.big{width:100%}

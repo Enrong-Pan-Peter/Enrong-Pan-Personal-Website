@@ -1,0 +1,6 @@
+.DS_Store
+*.HEIC
+*.heic
+wheel-src/node_modules/
+wheel-src/.next/
+wheel-src/out/
